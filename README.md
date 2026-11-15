@@ -1,9 +1,9 @@
 
-# CineScope
+# FrameScout
 
-CineScope is a Django movie discovery catalog. Browse titles by genre, release year, director and catalog score, then open a film page for its details and related picks.
+FrameScout is a Django movie discovery catalog. Browse titles by genre, release year, director and catalog score, then open a film page for its details and related picks.
 
-**Live site:** [cinescope-3pc5.onrender.com](https://cinescope-3pc5.onrender.com/)
+**Preview:** [cinescope-3pc5.onrender.com](https://cinescope-3pc5.onrender.com/) (Render Free may sleep between visits.)
 
 ## Features
 
@@ -15,7 +15,7 @@ CineScope is a Django movie discovery catalog. Browse titles by genre, release y
 - Copy a clean film detail link to share; the link omits the private return-to-results query.
 - Save films to a private, device-local watchlist; its save buttons stay accurate while you search or sort, and the page explains when browser storage is unavailable.
 - Export the watchlist as JSON, then merge a validated backup later on the same or another device; imports keep existing picks, skip unsafe entries and duplicates without letting them crowd out valid films, and cap the list at 100.
-- Ask CineScope to pick a random film from your saved list, then open that film directly.
+- Ask FrameScout to pick a random film from your saved list, then open that film directly.
 - Responsive poster-first layout, keyboard-accessible controls, reduced-motion support and lazy-loaded images.
 - Quick genre links with live catalog counts.
 - A nonce-based Content Security Policy, restrictive browser permissions and Django security headers.
@@ -107,7 +107,7 @@ The watchlist is stored in this browser's local storage. Clearing browser site d
 
 ## Project Structure
 
-- `Cinescope/` – Django project configuration (`settings.py`, `urls.py`, `wsgi.py`, `asgi.py`)
+- `Cinescope/` – Django project configuration (`settings.py`, `urls.py`, `wsgi.py`, `asgi.py`; internal package name)
 - `home/` – Main Django app containing models, views, and routes
 - `templates/` – HTML templates for all views
 - `static/` – Static files
@@ -119,7 +119,7 @@ The watchlist is stored in this browser's local storage. Clearing browser site d
 
 ```bash
 git clone <your-repo-url>
-cd Cinescope
+cd framescout
 ```
 
 ### 2) Create and activate virtual environment
@@ -177,5 +177,12 @@ Open: <http://127.0.0.1:8000/>
 ## Notes
 
 - SQLite is used for the seeded catalog. Keep user-submitted content off this deployment until a persistent database is configured.
-- Render runs migrations and idempotently seeds the sample catalog during deploy; `/healthz/` is the configured health check.
+- Render runs migrations and idempotently seeds the sample catalog during deploy; `/healthz/` is the configured health check. The free service can sleep after 15 minutes idle, take about a minute to wake, and loses local SQLite changes when it restarts or sleeps. Treat it as a demo, not paid-service hosting.
 - GitHub Actions runs the Django checks, Python tests, and watchlist import regression tests. Dependabot checks Python and workflow dependencies weekly.
+
+## Revenue readiness
+
+- This is currently a free discovery demo: it has no paid plan, checkout, account-synced watchlists or validated customer demand. Saved watchlists stay in the visitor's browser.
+- Sample poster URLs use TMDB's image CDN. The footer now provides the source, non-endorsement notice, and TMDB's official logo/attribution guidance. The approved TMDB logo still needs to be added from its official assets before promotion. TMDB's developer API is non-commercial; obtain a commercial license or replace the data and images with commercially licensed sources before charging users. See the [official TMDB FAQ](https://developer.themoviedb.org/docs/faq).
+- A possible paid direction is shared discovery lists for film clubs, but that needs customer validation, licensed content and durable hosting first. Do not claim subscriptions or revenue yet.
+- `free-for.dev` is a discovery list for infrastructure offers, not a production guarantee. Check each provider's current terms before adopting it. Render says its free services are intended for testing and hobby previews; production use needs suitable paid compute and persistent storage. See [Render's free-instance limits](https://render.com/docs/free).

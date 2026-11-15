@@ -2,7 +2,9 @@ from django.conf import settings
 from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
 from datetime import date, timedelta
 import re
+from unittest.mock import patch
 
+from django.db import OperationalError
 from django.urls import reverse
 
 from .models import Movie
@@ -35,6 +37,14 @@ class PublicSecurityHeaderTests(TestCase):
         self.assertEqual(response["X-Content-Type-Options"], "nosniff")
         self.assertEqual(response["Referrer-Policy"], "strict-origin-when-cross-origin")
         self.assertEqual(response["Cross-Origin-Opener-Policy"], "same-origin")
+
+    def test_tmdb_credits_and_non_endorsement_notice_are_visible(self):
+        response = self.client.get(reverse("home"))
+
+        self.assertContains(response, 'aria-label="Credits"')
+        self.assertContains(response, "This product uses the TMDB API but is not endorsed or certified by TMDB.")
+        self.assertContains(response, 'href="https://www.themoviedb.org"')
+        self.assertContains(response, 'href="https://www.themoviedb.org/about/logos-attribution"')
 
     def test_movie_json_ld_script_receives_the_matching_nonce(self):
         movie = Movie.objects.create(
@@ -158,6 +168,11 @@ class MoviePaginationTests(TestCase):
         self.assertGreaterEqual(year.context["page_obj"].paginator.count, 1)
         self.assertContains(plot, "title, plot, genre, director or release year")
 
+    def test_search_treats_non_year_numeric_queries_as_text(self):
+        response = self.client.get(reverse("search"), {"q": "9" * 100})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["page_obj"].paginator.count, 0)
+
     def test_search_ranks_exact_and_prefix_titles_before_plot_matches(self):
         exact = Movie.objects.create(
             title="Neptune", description="A quiet journey.", release_date=date(2000, 1, 1),
@@ -217,3 +232,11 @@ class MoviePaginationTests(TestCase):
         self.assertEqual(self.client.get(reverse("healthz")).json(), {"status": "ok"})
         self.assertContains(self.client.get(reverse("robots")), "Sitemap:")
         self.assertContains(self.client.get(reverse("sitemap")), "/movie/1/")
+
+    def test_health_check_reports_database_outage_without_leaking_details(self):
+        with patch("home.views.connection.cursor", side_effect=OperationalError("private database detail")):
+            response = self.client.get(reverse("healthz"))
+
+        self.assertEqual(response.status_code, 503)
+        self.assertEqual(response.json(), {"status": "unavailable"})
+        self.assertNotIn(b"private database detail", response.content)

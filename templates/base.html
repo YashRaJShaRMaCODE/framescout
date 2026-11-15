@@ -8,13 +8,13 @@
     <link rel="icon" href="{% static 'favicon.svg' %}" type="image/svg+xml">
     <link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
     <meta property="og:type" content="{% block og_type %}website{% endblock %}">
-    <meta property="og:site_name" content="CineScope">
-    <meta property="og:title" content="{% block og_title %}CineScope — Find your next film{% endblock %}">
+    <meta property="og:site_name" content="FrameScout">
+    <meta property="og:title" content="{% block og_title %}FrameScout — Find your next film{% endblock %}">
     <meta property="og:description" content="{% block og_description %}Discover films by genre, director, release date and rating in a thoughtfully curated movie catalog.{% endblock %}">
     {% block og_image %}{% endblock %}
     <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
     <meta name="twitter:card" content="summary_large_image">
-    <title>{% block title %}CineScope — Find your next film{% endblock %}</title>
+    <title>{% block title %}FrameScout — Find your next film{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,7 +27,7 @@
 <a class="cine-skip-link" href="#top">Skip to content</a>
 
 <header class="cine-nav">
-    <a class="cine-brand" href="/" aria-label="CineScope home"><span aria-hidden="true">C</span>CineScope</a>
+    <a class="cine-brand" href="/" aria-label="FrameScout home"><span aria-hidden="true">F</span>FrameScout</a>
     <nav class="cine-links" aria-label="Film collections">
         <a href="/#genres">Genres</a>
         <a href="{% url 'popular' %}"{% if request.resolver_match.url_name == 'popular' %} aria-current="page"{% endif %}>Popular</a>
@@ -57,7 +57,7 @@
         </select>
         <button class="cine-watchlist-export" id="cine-watchlist-export" type="button" disabled>Export JSON</button>
         <button class="cine-watchlist-export" id="cine-watchlist-import" type="button">Import JSON</button>
-        <input id="cine-watchlist-file" type="file" accept="application/json,.json" hidden aria-label="Choose a CineScope watchlist backup">
+        <input id="cine-watchlist-file" type="file" accept="application/json,.json" hidden aria-label="Choose a FrameScout watchlist backup">
     </div>
     <p class="cine-watchlist-results" id="cine-watchlist-results" role="status" aria-live="polite" hidden></p>
     <button class="cine-watchlist-pick" id="cine-watchlist-pick" type="button" aria-label="Choose a random film from your watchlist" disabled>Pick one for me</button>
@@ -70,7 +70,15 @@
 <main class="cine-content" id="top" tabindex="-1">
     {% block content %}{% endblock %}
   </main>
-<footer class="cine-footer"><a href="/">CineScope</a><span>Browse a little deeper.</span><a href="#top">Back to top ↑</a></footer>
+<footer class="cine-footer">
+    <a href="/">FrameScout</a><span>Browse a little deeper.</span><a href="#top">Back to top ↑</a>
+    <section class="cine-footer-credits" aria-label="Credits">
+        <strong>Credits</strong>
+        <span>This product uses the TMDB API but is not endorsed or certified by TMDB.</span>
+        <a href="https://www.themoviedb.org" target="_blank" rel="noopener noreferrer">The Movie Database (TMDB)</a>
+        <a href="https://www.themoviedb.org/about/logos-attribution" target="_blank" rel="noopener noreferrer">TMDB logo and attribution requirements</a>
+    </section>
+</footer>
 <script type="module" src="{% static 'site.js' %}"></script>
 
 </body>

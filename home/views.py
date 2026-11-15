@@ -3,6 +3,7 @@ from datetime import date
 import json
 
 from django.core.paginator import Paginator
+from django.db import DatabaseError, connection
 from django.db.models import Case, Count, IntegerField, Q, Value, When
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render
@@ -27,6 +28,11 @@ def render_movies(request, movies, template, **context):
 
 
 def healthz(_request):
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+    except DatabaseError:
+        return JsonResponse({"status": "unavailable"}, status=503)
     return JsonResponse({"status": "ok"})
 
 
@@ -122,12 +128,13 @@ def movie_detail(request, movie_id):
 
 def search(request):
     query = request.GET.get('q', '').strip()[:100]
+    year_query = int(query) if len(query) == 4 and query.isdigit() else None
     search_query = (
         Q(title__icontains=query) | Q(genre__icontains=query) | Q(director__icontains=query)
         | Q(description__icontains=query)
     )
-    if query.isdigit():
-        search_query |= Q(release_date__year=int(query))
+    if year_query is not None and year_query > 0:
+        search_query |= Q(release_date__year=year_query)
     if query:
         rank_rules = [
             When(title__iexact=query, then=Value(0)),
@@ -135,8 +142,8 @@ def search(request):
             When(title__icontains=query, then=Value(2)),
             When(Q(genre__icontains=query) | Q(director__icontains=query), then=Value(3)),
         ]
-        if query.isdigit():
-            rank_rules.append(When(release_date__year=int(query), then=Value(4)))
+        if year_query is not None and year_query > 0:
+            rank_rules.append(When(release_date__year=year_query, then=Value(4)))
         ordering = Case(
             *rank_rules,
             default=Value(5),

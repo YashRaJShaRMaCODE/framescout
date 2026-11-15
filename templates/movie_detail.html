@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}{{ movie.title }} ({{ movie.release_date|date:"Y" }}) — CineScope{% endblock %}
+{% block title %}{{ movie.title }} ({{ movie.release_date|date:"Y" }}) — FrameScout{% endblock %}
 {% block meta_description %}{{ movie.description|truncatechars:160 }}{% endblock %}
 {% block og_type %}article{% endblock %}
-{% block og_title %}{{ movie.title }} ({{ movie.release_date|date:"Y" }}) — CineScope{% endblock %}
+{% block og_title %}{{ movie.title }} ({{ movie.release_date|date:"Y" }}) — FrameScout{% endblock %}
 {% block og_description %}{{ movie.description|truncatechars:160 }}{% endblock %}
 {% block og_image %}<meta property="og:image" content="{{ movie.poster_url }}">{% endblock %}
 {% block extra_head %}<script nonce="{{ request.csp_nonce }}" type="application/ld+json">{{ movie_schema }}</script>{% endblock %}
