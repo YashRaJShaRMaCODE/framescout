@@ -76,3 +76,4 @@ a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(-
 .cine-watchlist-tools :disabled{opacity:.48;cursor:not-allowed}
 .cine-watchlist-results{margin:6px 0;color:var(--muted);font-size:12px}
 @media(max-width:760px){.cine-watchlist-toggle{min-height:44px}}
+.cine-recommendations{max-width:520px;margin:18px auto 0;text-align:left;color:var(--muted);font-size:12px}.cine-recommendations label{display:flex;align-items:flex-start;gap:8px}.cine-recommendations input{accent-color:var(--gold)}.cine-recommendations ul{display:grid;gap:8px;padding-left:20px}.cine-recommendations a{color:var(--gold);text-underline-offset:3px}

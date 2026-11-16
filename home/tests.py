@@ -94,6 +94,7 @@ class PublicSecurityHeaderTests(TestCase):
             response = self.client.get(reverse("home"))
 
         self.assertNotContains(response, "data-leadhub-form")
+        self.assertNotContains(response, "data-leadhub-recommendations")
 
     def test_leadhub_form_uses_configured_https_origin_and_explicit_consent(self):
         origin = "https://leads.example.test"
@@ -103,6 +104,8 @@ class PublicSecurityHeaderTests(TestCase):
         self.assertContains(response, 'data-leadhub-form')
         self.assertContains(response, f'data-endpoint="{origin}/api/subscribe"')
         self.assertContains(response, 'name="consent" type="checkbox" required')
+        self.assertContains(response, f'data-endpoint="{origin}/api/recommendations"')
+        self.assertContains(response, 'data-recommendations-consent')
         self.assertIn(f"connect-src 'self' {origin}", response["Content-Security-Policy"])
 
 

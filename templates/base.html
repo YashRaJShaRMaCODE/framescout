@@ -92,6 +92,11 @@
         <button type="submit">Join the list <span aria-hidden="true">↗</span></button>
         <p class="cine-leadhub-status" data-leadhub-status role="status" aria-live="polite"></p>
     </form>
+    <div class="cine-recommendations" data-leadhub-recommendations data-endpoint="{{ leadhub_base_url }}/api/recommendations">
+        <label><input type="checkbox" data-recommendations-consent> Show me relevant products too. This does not share viewing activity.</label>
+        <p data-recommendations-status role="status" aria-live="polite"></p>
+        <ul data-recommendations-list></ul>
+    </div>
 </section>
 {% endif %}
 <script type="module" src="{% static 'site.js' %}"></script>
