@@ -79,6 +79,21 @@
         <a href="https://www.themoviedb.org/about/logos-attribution" target="_blank" rel="noopener noreferrer">TMDB logo and attribution requirements</a>
     </section>
 </footer>
+{% if leadhub_base_url %}
+<section class="cine-leadhub" aria-labelledby="cine-leadhub-title">
+    <p class="cine-kicker">THE NEXT GREAT FILM NIGHT</p>
+    <h2 id="cine-leadhub-title">Get better picks in your inbox.</h2>
+    <p>Occasional FrameScout discoveries. Confirm your email first; unsubscribe whenever you like.</p>
+    <form class="cine-leadhub-form" data-leadhub-form data-endpoint="{{ leadhub_base_url }}/api/subscribe">
+        <label class="visually-hidden" for="cine-leadhub-email">Email address</label>
+        <input id="cine-leadhub-email" name="email" type="email" autocomplete="email" maxlength="254" placeholder="you@example.com" required>
+        <label class="cine-leadhub-consent"><input name="consent" type="checkbox" required> Email me FrameScout updates. I can unsubscribe anytime.</label>
+        <div class="cine-leadhub-honeypot" aria-hidden="true"><label for="cine-leadhub-website">Leave this field empty</label><input id="cine-leadhub-website" name="website" tabindex="-1" autocomplete="off"></div>
+        <button type="submit">Join the list <span aria-hidden="true">↗</span></button>
+        <p class="cine-leadhub-status" data-leadhub-status role="status" aria-live="polite"></p>
+    </form>
+</section>
+{% endif %}
 <script type="module" src="{% static 'site.js' %}"></script>
 
 </body>

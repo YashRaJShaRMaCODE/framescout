@@ -7,7 +7,29 @@ from unittest.mock import patch
 from django.db import OperationalError
 from django.urls import reverse
 
+from Cinescope.settings import database_config
 from .models import Movie
+
+
+class DatabaseConfigurationTests(SimpleTestCase):
+    def test_database_defaults_to_local_sqlite(self):
+        config = database_config({})
+
+        self.assertEqual(config["ENGINE"], "django.db.backends.sqlite3")
+        self.assertTrue(config["NAME"].endswith("db.sqlite3"))
+
+    def test_postgresql_uses_env_credentials_and_connection_health_checks(self):
+        config = database_config({
+            "DJANGO_DB_ENGINE": "postgresql",
+            "DJANGO_DB_NAME": "framescout",
+            "DJANGO_DB_USER": "app",
+            "DJANGO_DB_PASSWORD": "test-only",
+            "DJANGO_DB_HOST": "db.example.test",
+        })
+
+        self.assertEqual(config["ENGINE"], "django.db.backends.postgresql")
+        self.assertEqual(config["PORT"], "5432")
+        self.assertTrue(config["CONN_HEALTH_CHECKS"])
 
 
 class ProductionCookieSettingsTests(SimpleTestCase):
@@ -66,6 +88,22 @@ class PublicSecurityHeaderTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertNotIn("Content-Security-Policy", response)
+
+    def test_leadhub_form_is_hidden_until_an_https_service_is_configured(self):
+        with override_settings(LEADHUB_BASE_URL="", LEADHUB_ORIGIN=""):
+            response = self.client.get(reverse("home"))
+
+        self.assertNotContains(response, "data-leadhub-form")
+
+    def test_leadhub_form_uses_configured_https_origin_and_explicit_consent(self):
+        origin = "https://leads.example.test"
+        with override_settings(LEADHUB_BASE_URL=origin, LEADHUB_ORIGIN=origin):
+            response = self.client.get(reverse("home"))
+
+        self.assertContains(response, 'data-leadhub-form')
+        self.assertContains(response, f'data-endpoint="{origin}/api/subscribe"')
+        self.assertContains(response, 'name="consent" type="checkbox" required')
+        self.assertIn(f"connect-src 'self' {origin}", response["Content-Security-Policy"])
 
 
 @override_settings(SECURE_SSL_REDIRECT=False)

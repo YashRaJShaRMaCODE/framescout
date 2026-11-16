@@ -20,6 +20,7 @@ FrameScout is a Django movie discovery catalog. Browse titles by genre, release 
 - Quick genre links with live catalog counts.
 - A nonce-based Content Security Policy, restrictive browser permissions and Django security headers.
 - `sitemap.xml`, `robots.txt` and `/healthz/` routes for discovery and deployment checks.
+- Optional double-opt-in FrameScout updates signup through EatItAll LeadHub when `LEADHUB_BASE_URL` is set to its HTTPS origin; it stays hidden when unset.
 - Django admin for maintaining the catalog.
 
 The watchlist is stored in this browser's local storage. Clearing browser site data removes it.
@@ -140,6 +141,7 @@ pip install -r requirements.txt
 ```powershell
 $env:DJANGO_SECRET_KEY = "local-development-only"
 $env:DJANGO_DEBUG = "true"
+$env:LEADHUB_BASE_URL = "https://your-leadhub-host.example"
 ```
 
 On macOS/Linux, use `export` for those variables. Then:
@@ -183,6 +185,8 @@ Open: <http://127.0.0.1:8000/>
 ## Revenue readiness
 
 - This is currently a free discovery demo: it has no paid plan, checkout, account-synced watchlists or validated customer demand. Saved watchlists stay in the visitor's browser.
+- Local development defaults to SQLite. For a durable deployment database, set `DJANGO_DB_ENGINE=postgresql` plus `DJANGO_DB_NAME`, `DJANGO_DB_USER`, `DJANGO_DB_PASSWORD`, and `DJANGO_DB_HOST` in the host's secret environment settings; `DJANGO_DB_PORT` defaults to `5432`. The PostgreSQL driver is included. Run migrations after configuring it. Render's current blueprint still does not provision a database, so add a managed PostgreSQL instance and set these secrets before relying on persistence. See `.env.example` for variable names.
+- Set `LEADHUB_BASE_URL` only after the shared LeadHub service is deployed on HTTPS. The signup requires explicit consent and confirmation; live delivery is unverified until the sender and project URL are configured.
 - Sample poster URLs use TMDB's image CDN. The footer now provides the source, non-endorsement notice, and TMDB's official logo/attribution guidance. The approved TMDB logo still needs to be added from its official assets before promotion. TMDB's developer API is non-commercial; obtain a commercial license or replace the data and images with commercially licensed sources before charging users. See the [official TMDB FAQ](https://developer.themoviedb.org/docs/faq).
 - A possible paid direction is shared discovery lists for film clubs, but that needs customer validation, licensed content and durable hosting first. Do not claim subscriptions or revenue yet.
 - `free-for.dev` is a discovery list for infrastructure offers, not a production guarantee. Check each provider's current terms before adopting it. Render says its free services are intended for testing and hobby previews; production use needs suitable paid compute and persistent storage. See [Render's free-instance limits](https://render.com/docs/free).

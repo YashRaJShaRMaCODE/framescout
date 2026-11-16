@@ -12,10 +12,47 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 import os
 from pathlib import Path
+from urllib.parse import urlparse
 from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+def database_config(env=os.environ):
+    engine = env.get("DJANGO_DB_ENGINE", "sqlite3").strip().lower()
+    if engine in {"sqlite3", "django.db.backends.sqlite3"}:
+        return {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": env.get("DJANGO_DB_NAME", str(BASE_DIR / "db.sqlite3")),
+        }
+    if engine in {"postgres", "postgresql", "django.db.backends.postgresql"}:
+        required = ("DJANGO_DB_NAME", "DJANGO_DB_USER", "DJANGO_DB_PASSWORD", "DJANGO_DB_HOST")
+        missing = [key for key in required if not env.get(key)]
+        if missing:
+            raise ImproperlyConfigured(f"Set database environment variables: {', '.join(missing)}.")
+        return {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": env["DJANGO_DB_NAME"],
+            "USER": env["DJANGO_DB_USER"],
+            "PASSWORD": env["DJANGO_DB_PASSWORD"],
+            "HOST": env["DJANGO_DB_HOST"],
+            "PORT": env.get("DJANGO_DB_PORT", "5432"),
+            "CONN_MAX_AGE": 60,
+            "CONN_HEALTH_CHECKS": True,
+        }
+    raise ImproperlyConfigured("DJANGO_DB_ENGINE must be sqlite3 or postgresql.")
+
+
+LEADHUB_BASE_URL = os.environ.get("LEADHUB_BASE_URL", "").strip().rstrip("/")
+LEADHUB_ORIGIN = ""
+if LEADHUB_BASE_URL:
+    leadhub_url = urlparse(LEADHUB_BASE_URL)
+    if leadhub_url.scheme == "https" and leadhub_url.netloc and not leadhub_url.username and not leadhub_url.password:
+        LEADHUB_ORIGIN = f"https://{leadhub_url.netloc}"
+        LEADHUB_BASE_URL = LEADHUB_ORIGIN
+    else:
+        LEADHUB_BASE_URL = ""
 
 
 # Quick-start development settings - unsuitable for production
@@ -80,6 +117,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'home.context_processors.leadhub_config',
             ],
         },
     },
@@ -91,12 +129,7 @@ WSGI_APPLICATION = 'Cinescope.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+DATABASES = {"default": database_config()}
 
 
 # Password validation

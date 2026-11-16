@@ -1,5 +1,7 @@
 import secrets
 
+from django.conf import settings
+
 
 class PublicContentSecurityPolicyMiddleware:
     def __init__(self, get_response):
@@ -13,7 +15,7 @@ class PublicContentSecurityPolicyMiddleware:
             response["Content-Security-Policy"] = "; ".join((
                 "default-src 'self'",
                 "base-uri 'self'",
-                "connect-src 'self'",
+                f"connect-src 'self' {settings.LEADHUB_ORIGIN}".rstrip(),
                 "font-src 'self' https://fonts.gstatic.com",
                 "form-action 'self'",
                 "frame-ancestors 'none'",
