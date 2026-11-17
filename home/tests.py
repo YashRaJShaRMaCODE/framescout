@@ -251,6 +251,25 @@ class MoviePaginationTests(TestCase):
         self.assertGreaterEqual(len(response.context["related_movies"]), 4)
         self.assertNotIn(movie.pk, [related.pk for related in response.context["related_movies"]])
 
+    def test_movie_detail_hides_plot_until_user_reveals_spoiler_labeled_summary(self):
+        movie = Movie.objects.create(
+            title="Spoiler Toggle Test",
+            description="A hidden twist at the end.",
+            release_date=date(2020, 1, 1),
+            genre="Drama",
+            director="A. Director",
+            rating=7.5,
+            poster_url="https://example.com/posters/spoiler-test.jpg",
+        )
+
+        response = self.client.get(reverse("movie_detail", args=[movie.pk]))
+
+        self.assertContains(response, '<details class="cine-plot-summary">')
+        self.assertContains(response, "Show plot summary (may include spoilers)")
+        self.assertNotContains(response, '<details class="cine-plot-summary" open>')
+        self.assertContains(response, "A hidden twist at the end.")
+        self.assertContains(response, "Spoiler Toggle Test details, release date, genre, director, and catalog rating")
+
     def test_movie_detail_returns_to_the_safe_listing_url(self):
         movie = Movie.objects.first()
         return_to = f'{reverse("search")}?q=Sky&page=2'

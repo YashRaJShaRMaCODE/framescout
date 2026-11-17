@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% load static %}
 {% block title %}{{ movie.title }} ({{ movie.release_date|date:"Y" }}) — FrameScout{% endblock %}
-{% block meta_description %}{{ movie.description|truncatechars:160 }}{% endblock %}
+{% block meta_description %}{{ movie.title }} details, release date, genre, director, and catalog rating from FrameScout.{% endblock %}
 {% block og_type %}article{% endblock %}
 {% block og_title %}{{ movie.title }} ({{ movie.release_date|date:"Y" }}) — FrameScout{% endblock %}
-{% block og_description %}{{ movie.description|truncatechars:160 }}{% endblock %}
+{% block og_description %}Explore {{ movie.title }} details, including its release date, genre, director, and catalog rating.{% endblock %}
 {% block og_image %}<meta property="og:image" content="{{ movie.poster_url }}">{% endblock %}
 {% block extra_head %}<script nonce="{{ request.csp_nonce }}" type="application/ld+json">{{ movie_schema }}</script>{% endblock %}
 {% block content %}
@@ -29,7 +29,10 @@
         <button class="cine-copy-view cine-copy-film" id="cine-copy-view" type="button" data-copy-url="{{ share_url }}" data-copied-message="Film link copied.">Copy film link</button>
         <span class="cine-copy-status" id="cine-copy-status" role="status" aria-live="polite" hidden></span>
         <div class="cine-rule"></div>
-        <p class="cine-description">{{ movie.description }}</p>
+        <details class="cine-plot-summary">
+            <summary>Show plot summary (may include spoilers)</summary>
+            <p class="cine-description">{{ movie.description }}</p>
+        </details>
     </div>
 </div>
 
